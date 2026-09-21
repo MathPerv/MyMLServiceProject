@@ -1,0 +1,31 @@
+[project]
+name = "behavior-service"
+version = "0.1.1"
+description = "ML service on FastAPI"
+requires-python = ">=3.11, <3.13"
+
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "joblib",
+    "pandas",
+    "psycopg[binary]",
+    "pydantic",
+    "pydantic-settings",
+    "scikit-learn"
+]
+
+[dependecy-groups]
+dev = [
+    "pytest",
+    "httpx",
+    "locust",
+    "ruff"
+]
+
+[build-system]
+requires = ["uv_build>=0.12.10, <0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "behavior"
