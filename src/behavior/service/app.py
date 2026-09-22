@@ -93,6 +93,7 @@ class Prediction(BaseModel):
     model_version: str
     request_id: str
     latency_ms: float
+    code: int 
 
 
 @asynccontextmanager
@@ -128,11 +129,27 @@ def predict(x: Features, bg: BackgroundTasks) -> Prediction:
     request_id = str(uuid.uuid4())
     payload = x.model_dump()
     frame = pd.DataFrame([payload]).reindex(columns=app.state.meta["features"])
-
-    score = float(app.state.pipeline.predict_proba(frame)[0, 1])
+    frame = frame.rename(
+        columns={
+            "TimeSpentAlone": "Time_spent_Alone",
+            "StageFear": "Stage_fear",
+            "SocialEventAttendance": "Social_event_attendance",
+            "GoingOutside": "Going_outside",
+            "DrainedAfterSocializing": "Drained_after_socializing",
+            "FriendsCircleSize": "Friends_circle_size",
+            "PostFrequency": "Post_frequency"
+        }
+    )
+    try:
+        score = float(app.state.pipeline.predict_proba(frame)[0, 1])
+    except Exception as e:
+        score = None
+        latency_ms = round((time.perf_counter() - t0) * 1000, 2)
+        bg.add_task(db.save_prediction, request_id, payload, score, app.state.version, latency_ms, code=500)
+        raise HTTPException(500, "Scoring failed", headers={"request_id": request_id})
 
     latency_ms = round((time.perf_counter() - t0) * 1000, 2)
-
-    bg.add_task(db.save_prediction, request_id, payload, score, app.state.version, latency_ms)
+    bg.add_task(db.save_prediction, request_id, payload, score, app.state.version, latency_ms, code=200)
 
     return Prediction(score=score, model_version = app.state.version, request_id=request_id, latency_ms=latency_ms)
+    
