@@ -15,7 +15,7 @@ dependencies = [
     "scikit-learn"
 ]
 
-[dependecy-groups]
+[dependency-groups]
 dev = [
     "pytest",
     "httpx",

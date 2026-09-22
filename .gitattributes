@@ -2,3 +2,4 @@ gitattributes
 
 uv.lock text eol=lf
 model_notebook.ipynb text eol=lf
+.python-version text eol=lf
