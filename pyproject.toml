@@ -18,7 +18,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest",
-    "httpx",
+    "httpx2",
     "locust",
     "ruff"
 ]
@@ -29,3 +29,6 @@ build-backend = "uv_build"
 
 [tool.uv.build-backend]
 module-name = "behavior"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
