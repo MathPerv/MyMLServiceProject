@@ -1,3 +1,4 @@
 .venv
-
+/.img
+/img
 __pycache__/

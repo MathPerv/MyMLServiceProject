@@ -1,5 +1,6 @@
 services:
   api:
+    image: behavior-service:1.0
     build: .
     ports: ["8000:8000"]
     environment:
