@@ -146,7 +146,7 @@ def predict(x: Features, bg: BackgroundTasks):
         
         latency_ms = round((time.perf_counter() - t0) * 1000, 2)
         bg.add_task(db.save_prediction, request_id, payload, score, app.state.version, latency_ms, code=500)
-        raise HTTPException(500, "Scoring failed", headers={"request_id": request_id})
+        raise HTTPException(500, "Scoring failed", headers={"request_id": request_id}) from e
 
     latency_ms = round((time.perf_counter() - t0) * 1000, 2)
     bg.add_task(db.save_prediction, request_id, payload, score, app.state.version, latency_ms, code=200)

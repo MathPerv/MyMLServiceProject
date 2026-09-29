@@ -1,5 +1,7 @@
 import random
-from locust import HttpUser, task, between
+
+from locust import HttpUser, task
+
 
 class PredictUser(HttpUser):
 
