@@ -126,7 +126,7 @@ app = FastAPI(title="behavior-service", version="1.0", lifespan=lifespan)
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "model_version": getattr(app.state, "version", "unknown")}
+    return {"status": "ok", "model_version": getattr(app.state, "version", "unknown"), 'model_path': settings.model_path}
 
 
 @app.get("/ready")
