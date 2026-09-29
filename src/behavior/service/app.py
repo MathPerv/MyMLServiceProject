@@ -10,6 +10,7 @@ import pandas as pd
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, field_validator
 
 from behavior import db
@@ -141,7 +142,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     if request.url.path != PREDICT_PATH:
         return JSONResponse(
             status_code=422,
-            content={"detail": exc.errors()},
+            content=jsonable_encoder({"detail": exc.errors()}),
         )
 
     t0 = time.perf_counter()
@@ -173,12 +174,12 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
     return JSONResponse(
         status_code=422,
-        content={
+        content=jsonable_encoder({
             "detail": exc.errors(),
             "request_id": request_id,
-            "model_version": app.state.version,
-            "code": 422
-        },
+            "model_version": getattr(app.state, "version", "unknown"),
+            "code": 422,
+        }),
         headers={"request_id": request_id},
         background=bg,
     )
