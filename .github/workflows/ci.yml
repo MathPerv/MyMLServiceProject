@@ -20,7 +20,7 @@ jobs:
       DATABASE_URL: postgresql://postgres:test@localhost:5432/behavior
 
   build:
-    needs: test
+    needs: tests
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
