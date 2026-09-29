@@ -90,7 +90,7 @@ jobs:
       - name: service
         run: |
           kubectl apply -f k8s/
-          kubectl set image deploy/behavior-service api="$IMAGE""
+          kubectl set image deploy/behavior-service api="$IMAGE"
           kubectl rollout status deploy/behavior-service  --timeout=180s
 
       - name: smoke
