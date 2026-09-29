@@ -104,7 +104,7 @@ jobs:
 
           sleep 2
 
-          kubectl exec deploy/postgres --psql -U postgres -d behavior
+          kubectl exec deploy/postgres --psql -U postgres -d behavior \
             --tc "SELECT count(*) FROM predictions" | grep -q 1
 
       - name: diagnostic
@@ -112,13 +112,4 @@ jobs:
         run: |
           kubectl get pods -o wide
           kubectl describe deploy/behavior-service | tail -20
-          kubectl logs deploy/behavior-service --tail=30 || true 
-
-      - uses: docker/setup-buildx-action@v4
-      - uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ env.IMAGE }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          kubectl logs deploy/behavior-service --tail=30 || true
