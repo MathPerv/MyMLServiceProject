@@ -79,7 +79,7 @@ jobs:
           DB_PASSWORD: $ {{ secrets.DB_PASSWORD }}
         run: |
           kubectl create secret generic behavior-secrets \
-          --from-literal=POSTGRES_PASSWORD="$DB_PASSWORD"
+          --from-literal=POSTGRES_PASSWORD="$DB_PASSWORD" \
           --from-literal=DATABASE_URL=postgresql://postgres:$DB_PASSWORD@postgres:5432/behavior
 
       - name: db
@@ -111,7 +111,7 @@ jobs:
         if: failure()
         run: |
           kubectl get pods -o wide
-          kubectl desribe deploy/behavior-service | tail -20
+          kubectl describe deploy/behavior-service | tail -20
           kubectl logs deploy/behavior-service --tail=30 || true 
 
       - uses: docker/setup-buildx-action@v4
