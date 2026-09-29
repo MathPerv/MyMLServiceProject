@@ -18,6 +18,9 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
+          envFrom:
+            - configMapRef: {name: behavior-config}
+            - secretRef: {name: behavior-service}
           startupProbe:
             httpGet: {path: /health, port: 8000}
             failureThreshold: 30
