@@ -104,7 +104,7 @@ jobs:
 
           sleep 2
 
-          kubectl exec deploy/postgres --psql -U postgres -d behavior \
+          kubectl exec deploy/postgres -- psql -U postgres -d behavior \
             --tc "SELECT count(*) FROM predictions" | grep -q 1
 
       - name: diagnostic
