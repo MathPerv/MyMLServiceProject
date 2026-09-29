@@ -50,3 +50,75 @@ jobs:
           tags: ${{ env.IMAGE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build
+    # джоба идёт не в облаке GitHub, а на runner в Docker на машине с kind
+    runs-on: ubuntu-latest
+
+    permissions: {contents: read, packages: read}
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER}/behavior-service:sha-${GITHUB_SHA}" >> "$GITHUB_ENV"
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: helm/kind-action@v1
+        with: {cluster_name: ci}
+
+      - name: image to cluster
+        run: |
+          docker pull "$IMAGE"
+          kind load docker-image "$IMAGE" --name ci
+
+      - name: load secrets
+        env:
+          DB_PASSWORD: $ {{ secrets.DB_PASSWORD }}
+        run: |
+          kubectl create secret generic behavior-secrets \
+          --from-literal=POSTGRES_PASSWORD="$DB_PASSWORD"
+          --from-literal=DATABASE_URL=postgresql://postgres:$DB_PASSWORD@postgres:5432/behavior
+
+      - name: db
+        run: |
+          kubectl apply -f k8s/postgres.yaml
+          kubectl rollout status deploy/postgres --timeout=180s
+
+      - name: service
+        run: |
+          kubectl apply -f k8s/
+          kubectl set image deploy/behavior-service api="$IMAGE""
+          kubectl rollout status deploy/behavior-service  --timeout=180s
+
+      - name: smoke
+        run: |
+          kubectl port-forward svc/behavior-service 8080:80 &
+          sleep 5
+
+          curl --fail -s localhost:8080/health; echo
+          curl --fail -s -X POST localhost:8080/v1/predict \
+            -H "Content-Type: application/json" -d @good.json; echo
+
+          sleep 2
+
+          kubectl exec deploy/postgres --psql -U postgres -d behavior
+            --tc "SELECT count(*) FROM predictions" | grep -q 1
+
+      - name: diagnostic
+        if: failure()
+        run: |
+          kubectl get pods -o wide
+          kubectl desribe deploy/behavior-service | tail -20
+          kubectl logs deploy/behavior-service --tail=30 || true 
+
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ env.IMAGE }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
