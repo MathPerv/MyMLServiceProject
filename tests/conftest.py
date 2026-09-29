@@ -21,3 +21,15 @@ def good_row():
         "FriendsCircleSize": 13.0,
         "PostFrequency": 5.0
     }
+
+@pytest.fixture()
+def bad_row():
+    {
+        "TimeSpentAlone": -10.0,
+        "StageFear": "No",
+        "SocialEventAttendance": 4.0,
+        "GoingOutside": 6.0,
+        "DrainedAfterSocializing": "No",
+        "FriendsCircleSize": 13.0,
+        "PostFrequency": 5.0
+    }
