@@ -7,7 +7,8 @@ from typing import Literal
 import joblib
 import numpy as np
 import pandas as pd
-from fastapi import BackgroundTasks, FastAPI, HTTPException, Request, RequestValidationError
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, field_validator
 
