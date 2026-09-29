@@ -24,7 +24,7 @@ def good_row():
 
 @pytest.fixture()
 def bad_row():
-    {
+    return {
         "TimeSpentAlone": -10.0,
         "StageFear": "No",
         "SocialEventAttendance": 4.0,
