@@ -20,7 +20,7 @@ spec:
             - containerPort: 8000
           envFrom:
             - configMapRef: {name: behavior-config}
-            - secretRef: {name: behavior-secrets-wrong}
+            - secretRef: {name: behavior-secrets}
           startupProbe:
             httpGet: {path: /health, port: 8000}
             failureThreshold: 30
