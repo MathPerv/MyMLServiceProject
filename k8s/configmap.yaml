@@ -4,4 +4,4 @@ metadata:
   name: behavior-config
 data:
   LOG_LEVEL: "INFO"
-  MODEL_PATH: artifact/model_for_k8s.joblib
+  MODEL_PATH: artifact/model_for_k8s_never_exists.joblib
