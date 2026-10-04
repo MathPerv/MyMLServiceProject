@@ -22,7 +22,7 @@ spec:
               value: behavior
             - name: POSTGRES_PASSWORD
               valueFrom:
-                secretKeyRef: {name: behavior-secrets, key: POSTGRES_PASSWORD}
+                secretKeyRef: {name: behavior-secrets_wrong, key: POSTGRES_PASSWORD}
           readinessProbe:
             exec:
               command: ["pg_isready", "-U", "postgres"]
