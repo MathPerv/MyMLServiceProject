@@ -1,6 +1,6 @@
 def test_health(client):
     r = client.get("/health")
-    assert r.status_code == 422
+    assert r.status_code == 200
     assert "model_version" in r.json()
 
 
