@@ -1,0 +1,20 @@
+alertmanager:
+  enabled: false
+
+kubeEtcd: {enabled: false}
+kubeScheduler: {enabled: false}
+kubeProxy: {enabled: false}
+nodeExporter: {enabled: false}
+
+grafana:
+  adminPassword: admin
+  grafana.ini:
+    server:
+      root_url: http://grafana.localhost
+
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelecorNilUsesHelmValues: false
+    retention: 2d
+    resources: 
+      requests: {cpu: 100m, memory: 400Mi}
