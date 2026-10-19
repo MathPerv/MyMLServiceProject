@@ -4,17 +4,23 @@ import uuid
 from contextlib import asynccontextmanager
 from typing import Literal
 
-import joblib
 import numpy as np
 import pandas as pd
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from prometheus_client import Counter, Gauge, Histogram
 from pydantic import BaseModel, field_validator
 
 from behavior import db
 from behavior.config import settings
+from behavior.model_store import load_model
+
+PREDICTIONS = Counter("churn_predictions_total", "Predictions by class", ["churn"])
+SCORE = Histogram("churn_score", "Predicted churn probability", buckets=[i / 10 for i in range(11)])
+MODEL_INFO = Gauge("churn_model_info", "Model loaded by this pod", ["version"])
+LATENCY_BUCKETS = (0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1)  # штатные 0.1, 0.5, 1 с слишком грубые
 
 _MISSING = ['', 'na', 'n/a', 'nan', 'null', 'none']
 _RANGES = {'TimeSpentAlone': (0, 11), 'SocialEventAttendance': (0, 10),
@@ -112,10 +118,7 @@ class Prediction(BaseModel):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    bundle = joblib.load(settings.model_path)
-    app.state.pipeline = bundle["pipeline"]
-    app.state.meta = bundle["metadata"]
-    app.state.version = bundle["metadata"]["version"]
+    app.state.pipeline, app.state.meta, app.state.version = load_model()
 
     db.init()
     yield

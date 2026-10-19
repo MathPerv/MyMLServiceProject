@@ -12,7 +12,11 @@ dependencies = [
     "psycopg[binary]",
     "pydantic",
     "pydantic-settings",
-    "scikit-learn"
+    "scikit-learn",
+    "mlflow-skinny>=3.16,<4",
+    "skops>=0.11",
+    "prometheus-client>=0.21",
+    "prometheus-fastapi-instrumentator>=8"
 ]
 
 [dependency-groups]
