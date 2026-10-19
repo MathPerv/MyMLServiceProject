@@ -9,12 +9,12 @@ import sklearn
 from mlflow import MlflowClient
 from mlflow.exceptions import MlflowException
 from sklearn.compose import ColumnTransformer
+from sklearn.impute import KNNImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import average_precision_score, precision_recall_curve, roc_auc_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, OrdinalEncoder
-from sklearn.impute import KNNImputer
+from sklearn.preprocessing import OrdinalEncoder, StandardScaler
 
 DATA_PATH = Path(os.getenv("DATA_PATH", "datasets/telco_churn.csv"))
 MODEL_NAME = os.getenv("MODEL_NAME", "behavior")

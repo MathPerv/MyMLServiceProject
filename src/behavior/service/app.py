@@ -4,21 +4,18 @@ import uuid
 from contextlib import asynccontextmanager
 from typing import Literal
 
-import joblib
 import numpy as np
 import pandas as pd
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from fastapi.encoders import jsonable_encoder
-from prometheus_client import Counter, Gauge, Histogram
-from prometheus_fastapi_instrumentator import Instrumentator
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from prometheus_client import Counter, Gauge, Histogram
 from pydantic import BaseModel, field_validator
 
 from behavior import db
-from behavior.model_store import load_model
 from behavior.config import settings
-
+from behavior.model_store import load_model
 
 PREDICTIONS = Counter("churn_predictions_total", "Predictions by class", ["churn"])
 SCORE = Histogram("churn_score", "Predicted churn probability", buckets=[i / 10 for i in range(11)])
