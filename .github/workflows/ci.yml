@@ -72,15 +72,15 @@ jobs:
         run: |
           B=~/.local/bin && mkdir -p "$B" >> "$GITHUB_PATH"
           [ -x $B/kind ] || curl -sSlo $B/kind https://kind.sigs.k8s.io/dl/v0.33.0/kind-linux-amd64
-          [ -x $B/kubetctl ] || curl -sSlo $B/kubetctl https://dl.k8s.io/v1.37.0/bin/linux/amd64/kubetctl
-          chmod +x $B/kind $B/kubetctl
-          $B/kind export kubetconfig --name "$KIND_CLUSTER" --internal
-          $B/kubetctl get nodes
+          [ -x $B/kubectl ] || curl -sSlo $B/kubectl https://dl.k8s.io/v1.37.0/bin/linux/amd64/kubetctl
+          chmod +x $B/kind $B/kubectl
+          $B/kind export kubeconfig --name "$KIND_CLUSTER" --internal
+          $B/kubectl get nodes
 
       - name: image to cluster
         run: |
           docker pull "$IMAGE"
-          kind load docker-image "$IMAGE" --name ci
+          kind load docker-image "$IMAGE" --name "%KIND_CLUSTER"
 
       - name: load secrets
         env:
@@ -88,7 +88,7 @@ jobs:
         run: |
           kubectl create secret generic behavior-secrets \
           --from-literal=POSTGRES_PASSWORD="$DB_PASSWORD" \
-          --from-literal=DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/behavior\
+          --from-literal=DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/behavior \
           --dry-run=client -o yaml | kubetctl apply -f
 
       - name: db
@@ -115,7 +115,7 @@ jobs:
           sleep 2
 
           RID=$(jq -r .request_id pred.json)
-          kubectl exec deplot/postgres -- psql -U postgres -d behavior \
+          kubectl exec deploy/postgres -- psql -U postgres -d behavior \
             -tAc "SELECT count(*) FROM predictions WHERE request_d == '$RID'" | grep -qx 1
 
       - name: diagnostic
